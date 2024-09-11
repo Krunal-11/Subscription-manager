@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            background-color: beige;
+            padding: 25px;
+            font-size: larger;
+            padding-left: 75px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="userDetails"></div>
+
+    <script>
+        function formatDate(isoDate) {
+            const date = new Date(isoDate);
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+            const year = date.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
+        const urlParams = new URLSearchParams(window.location.search);
+        const userId = urlParams.get('id');
+
+        console.log('User ID:', userId);
+
+        if (userId) {
+            fetch(`http://localhost:8080/${userId}`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log('User Data:', data);
+                    const details = data[0];
+                    const container = document.getElementById('userDetails');
+                    container.innerHTML = '';
+                    container.innerHTML += `
+                    <h1> Welcome ${details.subscriber_name} </h1><br>
+                    
+                         Subscription Type : ${details.subscription_type} <br><br>
+                         Subscriber Name : ${details.subscriber_name} <br><br>
+                         Start Date :${formatDate(details.subscription_start_date)} <br><br>
+                          End Date: ${formatDate(details.subscription_end_date)} <br><br>
+                         Payment Status: ${details.payment_status} <br><br>
+                         Payment Date: ${formatDate(details.payment_date)} <br><br>
+                        
+                    `
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('userDetails').innerText = 'Failed to fetch user details';
+                });
+        } else {
+            document.getElementById('userDetails').innerText = 'No user ID provided';
+        }
+
+    </script>
+</body>
+
+</html>
